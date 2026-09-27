@@ -13,10 +13,13 @@ import {
 import { photos } from "../../../components/PetCard";
 import { usePrototype } from "../../../contexts/PrototypeContext";
 import { whatsappUrl } from "../../../data/models";
+import { ConfirmDialog } from "../../../components/ConfirmDialog";
 export default function Details() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { pets, orgs } = usePrototype();
   const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [info, setInfo] = useState("");
   const [error, setError] = useState("");
   const pet = pets.find((p) => p.id === id);
   const org = orgs.find((o) => o.id === pet?.orgId);
@@ -24,17 +27,27 @@ export default function Details() {
     return (
       <Screen back>
         <Empty
+          focus
           title="Pet não encontrado"
           description="Este registro não está disponível nesta sessão. Volte à busca."
         />
       </Screen>
     );
   const open = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    setInfo("");
     try {
       await Linking.openURL(whatsappUrl(org, pet));
       setConfirm(false);
+      setInfo(
+        "Abertura do WhatsApp solicitada. A mensagem só será enviada se você confirmar no serviço externo.",
+      );
     } catch {
       setError("Não foi possível abrir o WhatsApp. Tente novamente.");
+    } finally {
+      setBusy(false);
     }
   };
   return (
@@ -70,23 +83,22 @@ export default function Details() {
         </Notice>
         <Button
           title="Quero conhecer este pet · WhatsApp"
+          accessibilityHint="Abre uma confirmação antes de sair para o serviço externo."
           onPress={() => setConfirm(true)}
         />
-        {confirm && (
-          <View style={[s.card, { padding: 18, marginTop: 12 }]}>
-            <Text style={s.body}>
-              O botão abaixo abre um serviço externo com um número ilustrativo.
-              Para testar com uma organização real, cadastre seu próprio
-              WhatsApp no protótipo.
-            </Text>
-            <Button title="Abrir conversa externa" onPress={open} />
-            <Button
-              secondary
-              title="Cancelar"
-              onPress={() => setConfirm(false)}
-            />
-          </View>
-        )}
+        <ConfirmDialog
+          visible={confirm}
+          title="Abrir o WhatsApp?"
+          description="Você sairá do AdotaAí para um serviço externo. O número desta demonstração é ilustrativo. Nenhuma mensagem será enviada automaticamente."
+          confirmLabel="Abrir conversa externa"
+          busy={busy}
+          onConfirm={open}
+          onCancel={() => {
+            setConfirm(false);
+            setError("");
+          }}
+        />
+        {info && <Notice announce>{info}</Notice>}
         {error && <Notice error>{error}</Notice>}
       </View>
     </Screen>

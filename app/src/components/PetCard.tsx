@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { router } from "expo-router";
 import { Pet } from "../data/models";
@@ -10,20 +10,38 @@ export const photos: Record<string, number> = {
   cat: require("../../assets/cat.png"),
 };
 export function PetCard({ pet, city }: { pet: Pet; city: string }) {
+  const [focused, setFocused] = useState(false);
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Ver ${pet.name}, ${pet.age}, porte ${pet.size}`}
+      accessible
+      accessibilityLabel={`Conhecer ${pet.name}. ${pet.species}, ${pet.age}, porte ${pet.size}. ${pet.breed}. ${city}.`}
+      accessibilityHint="Abre os detalhes e o contato da organização."
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       onPress={() => router.push(`/pets/${pet.id}`)}
-      style={({ pressed }) => [s.card, { opacity: pressed ? 0.8 : 1 }]}
+      style={({ pressed }) => [
+        s.card,
+        {
+          borderWidth: 2,
+          borderColor: focused ? colors.ink : colors.border,
+          opacity: pressed ? 0.82 : 1,
+        },
+      ]}
     >
       <Image
         source={photos[pet.photo] ?? photos.dog}
-        accessibilityLabel={`Ilustração de ${pet.species.toLowerCase()}`}
+        accessible={false}
+        aria-hidden
         style={{ width: "100%", height: 210 }}
         resizeMode="cover"
       />
-      <View style={{ padding: 18, gap: 8 }}>
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        aria-hidden
+        style={{ padding: 18, gap: 8 }}
+      >
         <View style={[s.row, { justifyContent: "space-between" }]}>
           <Text style={s.section}>{pet.name}</Text>
           <Text style={{ color: colors.primary }}>Conhecer ↗</Text>
