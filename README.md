@@ -14,26 +14,23 @@ Documentação completa da proposta: [`/docs/proposta.md`](./docs/proposta.md)
 
 ---
 
-## Funcionalidades previstas
+## Etapa 02 implementada
 
-**Adotante (sem login)**
+Protótipo visual e navegável com **sete telas**, baseado na [proposta da Etapa 1](./docs/proposta.md) e nos requisitos da Etapa 2. Documentação da entrega: [docs/etapa-02.md](./docs/etapa-02.md).
 
-- [ ] Selecionar a cidade da busca
-- [ ] Listar pets disponíveis na cidade
-- [ ] Filtrar por idade, porte e raça
-- [ ] Ver detalhes de um pet
-- [ ] Contatar a organização via WhatsApp
+- Seleção obrigatória de cidade e catálogo público sem login.
+- Filtros opcionais de idade, porte e raça, detalhes e link para WhatsApp.
+- Login e cadastro simulados de organização.
+- Painel com pets da organização da sessão e formulário de novo pet.
+- Componentes reutilizáveis, formulários validados com Zod e layout responsivo.
 
-**Organização (com login)**
+**Dados em memória:** alterações e sessão são descartadas ao recarregar o aplicativo. Os pets, organizações, endereços e telefones iniciais são fictícios. As imagens são ilustrações locais. O login é uma demonstração de navegação, sem segurança de produção.
 
-- [ ] Cadastro de organização
-- [ ] Login com e-mail e senha
-- [ ] Cadastrar um novo pet
-- [ ] Listar os pets da própria organização
+**Conta de teste:** `demo@adotaai.com` / `adota123`. Organizações criadas na sessão entram com seu e-mail e a mesma senha pública `adota123`; a senha digitada no cadastro é validada, mas não armazenada. Não use dados ou credenciais reais.
 
 ---
 
-## Stack
+## Stack atual e planejada
 
 ### Mobile — `/app`
 
@@ -42,11 +39,11 @@ Documentação completa da proposta: [`/docs/proposta.md`](./docs/proposta.md)
 | React Native + Expo | Framework mobile multiplataforma |
 | TypeScript | Linguagem |
 | Expo Router | Navegação baseada em arquivos |
-| Axios + TanStack Query | Consumo e cache da API |
+| Axios + TanStack Query (futuro) | Consumo e cache da API |
 | Zod | Validação de formulários |
-| Expo SecureStore | Armazenamento do token JWT |
+| Expo SecureStore (futuro) | Armazenamento do token JWT |
 
-### Backend — `/api`
+### Backend previsto — `/api`
 
 | Tecnologia | Papel |
 |---|---|
@@ -66,35 +63,41 @@ Documentação completa da proposta: [`/docs/proposta.md`](./docs/proposta.md)
 tcs-II-repo/
 ├── docs/          # documentação de cada etapa da disciplina
 ├── app/           # aplicação mobile (React Native + Expo)
-├── api/           # backend (Node.js + Fastify + Prisma)
 └── README.md
 ```
+
+`api/` será criado na etapa de backend.
 
 ---
 
 ## Como executar
 
-> As instruções serão preenchidas conforme o código de cada parte for implementado nas próximas etapas.
-
-### Backend
-
-```bash
-cd api
-npm install
-docker compose up -d          # sobe o PostgreSQL
-npx prisma migrate dev        # aplica as migrations
-npm run dev
-```
-
-### Mobile
+Pré-requisitos: Node.js **24 LTS**, npm e, para testar em dispositivo, Expo Go compatível com SDK 57 ou um emulador configurado. A versão web permite avaliar toda a interface sem configurar Android ou iOS.
 
 ```bash
 cd app
-npm install
-npx expo start
+npm ci
+npm start
 ```
 
-> O banco de dados **não** é versionado. Cada máquina que clonar o projeto sobe o próprio container e aplica as migrations sobre um banco vazio.
+No terminal do Expo, pressione `w` para web, `a` para Android ou `i` para o simulador iOS (macOS com Xcode). Para iniciar diretamente no navegador:
+
+```bash
+npm run web
+```
+
+Verificações:
+
+```bash
+npm run typecheck
+npm test
+npm run export:web
+npx expo install --check
+```
+
+O protótipo **não requer API, Docker, banco, variáveis de ambiente ou serviços externos**. `api/`, Axios, TanStack Query, SecureStore e ViaCEP são previstos para etapas futuras e ainda não foram implementados. A abertura opcional do WhatsApp requer rede e sai do aplicativo.
+
+A exportação web fica em `app/dist`. Para hospedá-la, configure o servidor para encaminhar rotas como `/pets/luna` para `index.html` (SPA).
 
 ---
 
@@ -103,7 +106,7 @@ npx expo start
 | Etapa | Descrição | Tag | Status |
 |---|---|---|---|
 | 01 | Proposta e planejamento da aplicação | `etapa-01` | ✅ Entregue |
-| 02 | — | `etapa-02` | ⏳ |
+| 02 | Protótipo de interface navegável | `etapa-02` | ✅ Implementado |
 | 03 | — | `etapa-03` | ⏳ |
 
 ---
