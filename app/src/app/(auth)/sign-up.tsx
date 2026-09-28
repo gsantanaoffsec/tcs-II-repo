@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { router } from "expo-router";
 import { Screen, Heading, Field, Button, Notice, s } from "../../components/ui";
 import { usePrototype } from "../../contexts/PrototypeContext";
-import { orgSchema, errorsFrom } from "../../lib/validation";
+import { orgSchema } from "../../lib/validation";
 const fields = [
   ["name", "Nome da organização"],
   ["email", "E-mail"],
@@ -15,6 +15,7 @@ const fields = [
   ["street", "Rua"],
   ["number", "Número"],
 ] as const;
+import { useValidationFeedback } from "../../hooks/useValidationFeedback";
 export default function SignUp() {
   const { register } = usePrototype();
   const [values, setValues] = useState({
@@ -28,14 +29,15 @@ export default function SignUp() {
     street: "",
     number: "",
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { errors, setErrors, focusField, focusRequest, showErrors } =
+    useValidationFeedback();
   const [message, setMessage] = useState("");
   const [done, setDone] = useState(false);
   const submit = () => {
     setMessage("");
     const result = orgSchema.safeParse(values);
     if (!result.success) {
-      setErrors(errorsFrom(result.error));
+      showErrors(result.error);
       return;
     }
     setErrors({});
@@ -46,7 +48,16 @@ export default function SignUp() {
     setDone(true);
   };
   return (
-    <Screen back>
+    <Screen
+      back
+      confirmLeave={
+        !done &&
+        (Object.entries(values).some(
+          ([key, value]) => key !== "password" && !!value.trim(),
+        ) ||
+          values.password !== "adota123")
+      }
+    >
       <View style={s.form}>
         <Heading
           eyebrow="FAÇA PARTE"
@@ -55,14 +66,14 @@ export default function SignUp() {
         />
         {done ? (
           <>
-            <Notice>
+            <Notice announce>
               Organização cadastrada nesta sessão. Entre com{" "}
               {values.email.trim().toLowerCase()} e a senha pública adota123. A
               senha digitada não foi armazenada.
             </Notice>
             <Button
               title="Ir para o login"
-              onPress={() => router.replace("/sign-in")}
+              onPress={() => router.dismissTo("/sign-in")}
             />
           </>
         ) : (
@@ -77,13 +88,21 @@ export default function SignUp() {
                 key={key}
                 label={label}
                 value={values[key]}
-                onChangeText={(value) =>
+                onChangeText={(value) => {
                   setValues((old) => ({
                     ...old,
                     [key]: key === "state" ? value.toUpperCase() : value,
-                  }))
-                }
+                  }));
+                  setErrors((old) => {
+                    const next = { ...old };
+                    delete next[key];
+                    return next;
+                  });
+                  setMessage("");
+                }}
                 error={errors[key]}
+                focusRequest={focusRequest}
+                focusOnError={focusField === key}
                 secureTextEntry={key === "password"}
                 autoCapitalize={
                   key === "email" || key === "password"

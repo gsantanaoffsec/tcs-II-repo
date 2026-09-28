@@ -5,6 +5,7 @@ export default function NotFound() {
   return (
     <Screen>
       <Empty
+        focus
         title="Página não encontrada"
         description="Volte ao início para continuar a navegação."
       />

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, View } from "react-native";
 import { router } from "expo-router";
 import { usePrototype } from "../../contexts/PrototypeContext";
@@ -12,8 +12,10 @@ import {
   s,
 } from "../../components/ui";
 import { PetCard } from "../../components/PetCard";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 export default function Dashboard() {
-  const { session, pets, logout } = usePrototype();
+  const { session, pets, logout, setFeedback } = usePrototype();
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const columns = useColumns();
   if (!session) return null;
   const own = pets.filter((p) => p.orgId === session.id);
@@ -63,8 +65,22 @@ export default function Dashboard() {
         <Button
           secondary
           title="Sair da organização"
-          onPress={() => {
+          onPress={() => setConfirmLogout(true)}
+        />
+        <ConfirmDialog
+          visible={confirmLogout}
+          title="Sair da organização?"
+          description="Você sairá do painel. Os cadastros de demonstração continuam disponíveis até recarregar o aplicativo."
+          confirmLabel="Sair da organização"
+          onCancel={() => setConfirmLogout(false)}
+          onConfirm={() => {
+            setConfirmLogout(false);
             logout();
+            setFeedback({
+              path: "/",
+              message:
+                "Você saiu da organização. A busca de pets continua disponível sem login.",
+            });
             router.replace("/");
           }}
         />

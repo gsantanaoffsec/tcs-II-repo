@@ -30,6 +30,21 @@ Protótipo visual e navegável com **sete telas**, baseado na [proposta da Etapa
 
 ---
 
+## Etapa 03 implementada
+
+A [documentação da Etapa 3](./docs/etapa-03.md) descreve a evolução de navegação, UX e acessibilidade:
+
+- Menu inferior persistente com Início, Encontrar pets e Organização/Meu painel.
+- Retorno com destino alternativo para rotas abertas diretamente e filtros preservados.
+- Confirmações de descarte de formulário, saída da organização e abertura do WhatsApp.
+- Feedback de sucesso, erros por campo, foco no primeiro campo inválido e estados de interação.
+- Foco de teclado visível, títulos e rótulos acessíveis, regiões de anúncio e diálogos acessíveis.
+- Alvos de toque ampliados e testes automatizados de contraste de texto.
+
+A stack e os dados em memória da Etapa 2 foram mantidos. Não há autenticação de produção ou backend nesta etapa. A implementação oferece recursos para leitores de tela; a validação física com VoiceOver/TalkBack segue o roteiro documentado.
+
+---
+
 ## Stack atual e planejada
 
 ### Mobile — `/app`
@@ -107,7 +122,7 @@ A exportação web fica em `app/dist`. Para hospedá-la, configure o servidor pa
 |---|---|---|---|
 | 01 | Proposta e planejamento da aplicação | `etapa-01` | ✅ Entregue |
 | 02 | Protótipo de interface navegável | `etapa-02` | ✅ Implementado |
-| 03 | — | `etapa-03` | ⏳ |
+| 03 | Navegação, UX e acessibilidade | `etapa-03` | ✅ Implementado |
 
 ---
 

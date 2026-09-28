@@ -3,13 +3,17 @@
     "name": "AdotaAí",
     "slug": "adotaai",
     "scheme": "adotaai",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "orientation": "default",
     "userInterfaceStyle": "light",
-    "plugins": ["expo-router", "expo-status-bar"],
+    "plugins": [
+      "expo-router",
+      "expo-status-bar"
+    ],
     "web": {
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "lang": "pt-BR"
     }
   }
 }

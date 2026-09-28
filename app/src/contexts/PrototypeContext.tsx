@@ -9,6 +9,14 @@ type Store = {
   pets: Pet[];
   session: Org | null;
   city: string;
+  filters: { age: string; size: string; breed: string };
+  setFilters: React.Dispatch<
+    React.SetStateAction<{ age: string; size: string; breed: string }>
+  >;
+  feedback: { path: string; message: string } | null;
+  setFeedback: React.Dispatch<
+    React.SetStateAction<{ path: string; message: string } | null>
+  >;
   setCity: (city: string) => void;
   login: (email: string, password: string) => boolean;
   logout: () => void;
@@ -20,7 +28,21 @@ export function PrototypeProvider({ children }: React.PropsWithChildren) {
   const [orgs, setOrgs] = useState(initialOrgs);
   const [pets, setPets] = useState(initialPets);
   const [session, setSession] = useState<Org | null>(null);
-  const [city, setCity] = useState("");
+  const [city, updateCity] = useState("");
+  const [filters, setFilters] = useState({
+    age: "Todos",
+    size: "Todos",
+    breed: "",
+  });
+  const [feedback, setFeedback] = useState<{
+    path: string;
+    message: string;
+  } | null>(null);
+  const setCity = (value: string) => {
+    if (value.trim().toLocaleLowerCase() !== city.trim().toLocaleLowerCase())
+      setFilters({ age: "Todos", size: "Todos", breed: "" });
+    updateCity(value);
+  };
   // Somente a credencial pública de demonstração. Senhas cadastradas não são armazenadas.
   const [demoEmails, setDemoEmails] = useState([demoOrg.email]);
   const login = (email: string, password: string) => {
@@ -57,6 +79,10 @@ export function PrototypeProvider({ children }: React.PropsWithChildren) {
         pets,
         session,
         city,
+        filters,
+        setFilters,
+        feedback,
+        setFeedback,
         setCity,
         login,
         logout: () => setSession(null),

@@ -15,11 +15,12 @@ import { PetCard } from "../../../components/PetCard";
 import { usePrototype } from "../../../contexts/PrototypeContext";
 import { ages, sizes, filterPets } from "../../../data/models";
 export default function Pets() {
-  const { city, pets, orgs } = usePrototype();
+  const { city, pets, orgs, filters, setFilters } = usePrototype();
   const columns = useColumns();
-  const [age, setAge] = useState("Todos");
-  const [size, setSize] = useState("Todos");
-  const [breed, setBreed] = useState("");
+  const { age, size, breed } = filters;
+  const setAge = (age: string) => setFilters((old) => ({ ...old, age }));
+  const setSize = (size: string) => setFilters((old) => ({ ...old, size }));
+  const setBreed = (breed: string) => setFilters((old) => ({ ...old, breed }));
   if (!city.trim()) return <Redirect href="/" />;
   const results = filterPets(pets, orgs, city, {
     age: age === "Todos" ? "" : age,
@@ -37,7 +38,7 @@ export default function Pets() {
         <Button
           secondary
           title="Trocar cidade"
-          onPress={() => router.push("/")}
+          onPress={() => router.dismissTo("/")}
         />
         <View style={[s.card, { padding: 18, marginVertical: 20 }]}>
           <Choices
@@ -68,7 +69,11 @@ export default function Pets() {
             }}
           />
         </View>
-        <Text style={[s.label, { marginBottom: 16 }]}>
+        <Text
+          accessibilityLiveRegion="polite"
+          role="status"
+          style={[s.label, { marginBottom: 16 }]}
+        >
           {results.length}{" "}
           {results.length === 1 ? "amigo disponível" : "amigos disponíveis"}
         </Text>

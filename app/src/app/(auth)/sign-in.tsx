@@ -3,24 +3,31 @@ import { View } from "react-native";
 import { router } from "expo-router";
 import { Screen, Heading, Field, Button, Notice, s } from "../../components/ui";
 import { usePrototype } from "../../contexts/PrototypeContext";
-import { loginSchema, errorsFrom } from "../../lib/validation";
+import { loginSchema } from "../../lib/validation";
+import { useValidationFeedback } from "../../hooks/useValidationFeedback";
 export default function SignIn() {
-  const { login } = usePrototype();
+  const { login, setFeedback } = usePrototype();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { errors, setErrors, focusField, focusRequest, showErrors } =
+    useValidationFeedback();
   const [message, setMessage] = useState("");
   const submit = () => {
     setMessage("");
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
-      setErrors(errorsFrom(result.error));
+      showErrors(result.error);
       return;
     }
     setErrors({});
-    if (login(result.data.email, result.data.password))
+    if (login(result.data.email, result.data.password)) {
+      setFeedback({
+        path: "/dashboard",
+        message:
+          "Login de demonstração realizado. Você está no painel da sua organização.",
+      });
       router.replace("/dashboard");
-    else setMessage("Use uma conta de demonstração e a senha adota123.");
+    } else setMessage("Use uma conta de demonstração e a senha adota123.");
   };
   return (
     <Screen back>
@@ -41,8 +48,18 @@ export default function SignIn() {
           keyboardType="email-address"
           autoComplete="email"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(value) => {
+            setEmail(value);
+            setErrors((old) => {
+              const next = { ...old };
+              delete next.email;
+              return next;
+            });
+            setMessage("");
+          }}
           error={errors.email}
+          focusRequest={focusRequest}
+          focusOnError={focusField === "email"}
         />
         <Field
           label="Senha de demonstração"
@@ -50,8 +67,18 @@ export default function SignIn() {
           secureTextEntry
           autoCapitalize="none"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(value) => {
+            setPassword(value);
+            setErrors((old) => {
+              const next = { ...old };
+              delete next.password;
+              return next;
+            });
+            setMessage("");
+          }}
           error={errors.password}
+          focusRequest={focusRequest}
+          focusOnError={focusField === "password"}
           onSubmitEditing={submit}
         />
         {message && <Notice error>{message}</Notice>}
